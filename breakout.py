@@ -28,6 +28,19 @@ def decoration(board):
         cv2.putText(board, "ENTER SPACE", (130, BOARD_HEIGHT//2+200),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     2, (255, 255, 255), 2, cv2.LINE_AA)
+    if PAUSE:
+        cv2.putText(board, str(TURN), (BOARD_WIDTH//2, 45),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    2, (255, 255, 255), 2, cv2.LINE_AA)
+        cv2.putText(board, str(SCORE).zfill(3), (50, 95),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    2, (255, 255, 255), 2, cv2.LINE_AA)
+        cv2.putText(board, "PAUSE", (235, BOARD_HEIGHT//2+100),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    2, (0, 0, 255), 2, cv2.LINE_AA)
+        cv2.putText(board, "ENTER SPACE", (130, BOARD_HEIGHT//2+200),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    2, (255, 100, 0), 2, cv2.LINE_AA)
     if GAMEOVER and not CLEAR:
         cv2.putText(board, str(TURN), (BOARD_WIDTH//2, 45),
                     cv2.FONT_HERSHEY_SIMPLEX,
@@ -35,15 +48,15 @@ def decoration(board):
         cv2.putText(board, str(SCORE).zfill(3), (50, 95),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     2, (255, 255, 255), 2, cv2.LINE_AA)
-        cv2.putText(board, "BREAKOUT", (180, BOARD_HEIGHT//2),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    2, (255, 255, 255), 2, cv2.LINE_AA)
-        cv2.putText(board, "GAME OVER", (165, BOARD_HEIGHT//2+100),
+        cv2.putText(board, "GAME OVER", (165, BOARD_HEIGHT//2),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     2, (0, 0, 255), 2, cv2.LINE_AA)
-        cv2.putText(board, "ENTER Esc", (180, BOARD_HEIGHT//2+200),
+        cv2.putText(board, "PLAY AGAIN Space", (70, BOARD_HEIGHT//2+100),
                     cv2.FONT_HERSHEY_SIMPLEX,
-                    2, (255, 255, 255), 2, cv2.LINE_AA)
+                    2, (255, 100, 0), 2, cv2.LINE_AA)
+        cv2.putText(board, "EXIT Esc", (190, BOARD_HEIGHT//2+200),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    2, (0, 255, 255), 2, cv2.LINE_AA)
     if CLEAR:
         cv2.putText(board, str(TURN), (BOARD_WIDTH//2, 45),
                     cv2.FONT_HERSHEY_SIMPLEX,
@@ -256,7 +269,8 @@ def main():
     """
     MAIN PROGRAMING
     """
-    global STARTED, LEVEL, SPEED, POWER, BALL_POS, HIT_TOP
+    global STARTED, LEVEL, SPEED, POWER, BALL_POS, HIT_TOP, PAUSE, GAMEOVER,\
+        HIT_ID_SHOW, BLC_ID_SHOW, HIT_ID_LEVEL, BLC_ID_LEVEL, SCORE, TURN
     # WINDOW
     cv2.namedWindow(WIN_NAME, cv2.WINDOW_AUTOSIZE)
     cv2.setMouseCallback(WIN_NAME, mouse_event)
@@ -276,12 +290,30 @@ def main():
             key = cv2.waitKey(1)
             # GAME START
             if key == 32 and not GAMEOVER: # space
+                # EXIT DEMO SCREEN
                 STARTED = True
                 # Return initial conditions
                 BALL_POS = (BALL_X0, BALL_Y0)
                 SPEED = np.array((1, 1))
                 LEVEL = 0
                 HIT_TOP = False
+                break
+            if key == 32 and GAMEOVER: # space
+                # PLAY AGAINE
+                STARTED = True
+                GAMEOVER = False
+                HIT_TOP = False
+                # Return initial conditions
+                board_demo = np.copy(BOARD)
+                BALL_POS = (BALL_X0, BALL_Y0)
+                SCORE = 0
+                TURN = 1
+                LEVEL = 0
+                SPEED = np.array((1, 1))
+                HIT_ID_SHOW = []
+                BLC_ID_SHOW = []
+                HIT_ID_LEVEL = []
+                BLC_ID_LEVEL = []
                 break
             # EXIT
             if key == 27: # Esc
@@ -321,7 +353,11 @@ def main():
         key = cv2.waitKey(1)
         # PAUSE
         if key == 32: # Space
+            PAUSE = True
+            decoration(board_new)
+            cv2.imshow(WIN_NAME, board_new)
             cv2.waitKey(0)
+            PAUSE = False
         # EXIT
         elif key == 27: # Esc
             cv2.destroyAllWindows()
@@ -334,6 +370,7 @@ if __name__ == '__main__':
     HIT_TOP = False
     GAMEOVER = False
     CLEAR = False
+    PAUSE = False
     SCORE = 0
     TURN = 1
     LEVEL = 0
@@ -355,7 +392,7 @@ if __name__ == '__main__':
     BALL_POS = (BALL_X0, BALL_Y0)
     # PADDLE INFORMATION
     PADDLE_HEIGHT = 12
-    PADDLE_WIDTH_DEFO = 30
+    PADDLE_WIDTH_DEFO = 40
     PADDLE_WIDTH = PADDLE_WIDTH_DEFO
     PADDLE_X = BOARD_WIDTH//2 # initial position
     PADDLE_Y = BOARD_HEIGHT - 50
