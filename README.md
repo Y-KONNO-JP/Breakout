@@ -2,8 +2,6 @@
 
 Breakout implementation in Python
 
-You can play Breakout with python.
+Breakout can be played with python.
 
 The code is written Python3 base.
-
-Have fun!!
