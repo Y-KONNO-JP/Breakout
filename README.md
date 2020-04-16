@@ -2,6 +2,6 @@
 
 Breakout implementation in Python
 
-Breakout can be played with python.
+Breakout can be played in python.
 
 The code is written Python3 base.
